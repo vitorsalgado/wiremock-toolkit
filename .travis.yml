@@ -4,7 +4,6 @@ sudo: required
 
 services:
   - docker
-  - docker-compose
 
 script:
   - docker-compose -f docker-compose.yml up --build -d
