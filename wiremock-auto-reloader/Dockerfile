@@ -1,10 +1,10 @@
-FROM node:6.11.0
+FROM node:8.11.3
 
-WORKDIR /wiremock
+WORKDIR /app
 
-COPY package.json yarn.lock .
+COPY package.json package-lock.json .
 
-RUN yarn --production
+RUN npm install --production
 
 COPY . .
 

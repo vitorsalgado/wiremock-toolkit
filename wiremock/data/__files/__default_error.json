@@ -1,6 +1,0 @@
-{
-  "traceId": "0",
-  "code": 99,
-  "statusCode": "404",
-  "message": "Endpoint not found! Please, check WireMock mappings."
-}
