@@ -1,32 +1,34 @@
 'use strict';
 
-const Request = require('request-promise');
+const Request = require('request-promise').defaults({ pool: { maxSockets: process.env.RELOADER_MAX_HTTP_SOCKETS || 1 } });
 const Chokidar = require('chokidar');
 const IP = require('ip');
 
 const WIREMOCK_DATA = process.env.WIREMOCK_DATA || './data';
 const WIREMOCK_HOST = process.env.WIREMOCK_HOST || 'wiremock';
 const WIREMOCK_PORT = process.env.WIREMOCK_PORT || 3000;
+const WIREMOCK_BASE_URI = `${WIREMOCK_HOST}:${WIREMOCK_PORT}`
 
-const watcher = Chokidar.watch(WIREMOCK_DATA, { ignored: /[/\\]\./, persistent: true, ignoreInitial: true });
+const watcher = Chokidar.watch(WIREMOCK_DATA, { ignored: [/(^|[\/\\])\../], persistent: true, ignoreInitial: true });
 
 const onFileChange = (event, path) => {
-    const valid = path && path.length > 5 && path.substr(path.length - 5) === '.json';
+  const valid = path && path.substr(path.length - 5) === '.json' && path.length > 5;
 
-    if (!valid) {
-        return;
-    }
+  if (!valid) {
+    return;
+  }
 
-    console.log('\x1b[33mFile change detected. Reseting Wiremock mappings ...\x1b[0m');
+  console.log(`\x1b[33mStub change detected [${event}]. Reseting WireMock mappings ...\x1b[0m`);
 
-    Request.post(`http://${WIREMOCK_HOST}:${WIREMOCK_PORT}/__admin/mappings/reset`)
-        .then(() => console.log('\x1b[32mWiremock mappings reseted!\x1b[0m'))
-        .catch(() => console.error('\x1b[31mWiremock is unavailable now!\x1b[0m'));
+  Request({ uri: `${WIREMOCK_BASE_URI}/__admin/mappings/reset`, method: 'POST' })
+    .then(() => console.log('\x1b[32mWireMock mappings reseted!', '\x1b[0m'))
+    .catch(err => console.error('\x1b[31mWireMock is unavailable now!', err, '\x1b[0m'));
 };
 
 watcher
-    .on('add', (path) => onFileChange('add', path))
-    .on('change', (path) => onFileChange('change', path))
-    .on('unlink', (path) => onFileChange('unlink', path));
-
-console.log(`\x1b[32mWiremock Reloader ready.\nChange your API Base Uri to: http://${IP.address()}:${WIREMOCK_PORT}\x1b[0m`);
+  .on('ready', () => console.log(
+    `\x1b[32mWireMock Reloader Tool ready!\nContext: ${process.cwd()}\nWireMock: ${WIREMOCK_BASE_URI}\nListening for changes on: ${WIREMOCK_DATA}\nChange your API Base URI to: http://${IP.address()}:${WIREMOCK_PORT}\n\n`, '\x1b[0m'))
+  .on('error', error => console.error(error))
+  .on('add', path => onFileChange('add', path))
+  .on('change', path => onFileChange('change', path))
+  .on('unlink', path => onFileChange('unlink', path));

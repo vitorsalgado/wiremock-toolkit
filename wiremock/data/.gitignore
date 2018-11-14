@@ -1,0 +1,7 @@
+!__files/
+!mappings/
+
+__files/*
+!__files/__shared/
+mappings/*
+!mappings/__shared/
