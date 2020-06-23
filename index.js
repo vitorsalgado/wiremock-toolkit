@@ -14,7 +14,7 @@ const argv = process.argv
 if (argv.length <= 2) argv.push('--help')
 
 const initReloader = options =>
-  Spawn('node', ['wiremock-auto-reloader/index.js', '-p', options.port, '-d', options.dataDir], SHELL_OPTIONS)
+  Spawn('node', [`${__dirname}/wiremock-auto-reloader/index.js`, '-p', options.port, '-d', options.dataDir], SHELL_OPTIONS)
 
 Program
   .version(Config.version)
@@ -31,7 +31,7 @@ Program
 
     initReloader({ port: wiremockPort, dataDir: wiremockDataDir })
     Spawn('java',
-      ['-jar', 'wiremock/wiremock.jar', `--root-dir=${wiremockDataDir}`, `--port=${wiremockPort}`, '--verbose'],
+      ['-jar', `${__dirname}/wiremock/wiremock.jar`, `--root-dir=${wiremockDataDir}`, `--port=${wiremockPort}`, '--verbose'],
       SHELL_OPTIONS)
   })
 
@@ -46,7 +46,7 @@ Program
 
     initReloader({ port: wiremockPort, dataDir: wiremockDataDir })
     Spawn('java',
-      ['-jar', 'wiremock/wiremock.jar', `--root-dir=${wiremockDataDir}`, `--port=${wiremockPort}`, '--verbose', `--proxy-all=${Config.wiremock.proxyTo}`],
+      ['-jar', `${__dirname}/wiremock/wiremock.jar`, `--root-dir=${wiremockDataDir}`, `--port=${wiremockPort}`, '--verbose', `--proxy-all=${Config.wiremock.proxyTo}`],
       SHELL_OPTIONS)
   })
 
