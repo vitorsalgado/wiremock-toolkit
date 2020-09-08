@@ -7,8 +7,8 @@ const IP = require('ip');
 const argv = process.argv
 
 const wiremockPort = argv[argv.indexOf('-p') + 1] || (process.env.WIREMOCK_PORT || '3000')
-const wiremockDataDir = argv[argv.indexOf('-d') + 1] || (process.env.WIREMOCK_DATA || './data')
-const wiremockHost = process.env.WIREMOCK_HOST || 'wiremock';
+const wiremockDataDir = argv[argv.indexOf('-d') + 1] || (process.env.WIREMOCK_DATA || './wiremock/data')
+const wiremockHost = process.env.WIREMOCK_HOST || 'http://localhost';
 const wiremockBaseURI = `${wiremockHost}:${wiremockPort}`
 
 const watcher = Chokidar.watch(wiremockDataDir, { ignored: [/(^|[\/\\])\../], persistent: true, ignoreInitial: true });

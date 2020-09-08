@@ -15,4 +15,4 @@ nvm:
 	nvm use
 
 install:
-	npm install --production
+	npm i
